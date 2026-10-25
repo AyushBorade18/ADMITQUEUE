@@ -1,0 +1,34 @@
+# Render Blueprint: one native Node web service (no Docker).
+# NOT deployed or tested from this repository's build environment. Follow SETUP_FROM_ZERO.md and check the
+# two health URLs after the first deploy:  /api/health  and  /api/health/engine
+services:
+  - type: web
+    name: admitqueue
+    runtime: node
+    plan: free
+    # "--include=dev" because the build needs TypeScript and the scripts need tsx. The build step compiles the
+    # C++ engine with g++ (scripts/build-engine.mjs fails the build with a clear message if g++ is missing),
+    # runs its self check, then builds the website.
+    buildCommand: npm ci --include=dev && node scripts/build-engine.mjs --check && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false
+      - key: DEMO_MODE
+        value: "true"
+      - key: ADMIN_LOGIN_ID
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false

@@ -1,0 +1,28 @@
+# dependencies and build output
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+
+# secrets - never commit these
+.env
+.env.local
+.env.*.local
+*.pem
+
+# compiled C++ engine (built per machine: Windows .exe locally, Linux binary on Render)
+engine/build/*
+!engine/build/.gitkeep
+*.exe
+*.o
+*.obj
+
+# misc
+.DS_Store
+*.log
+*.tsbuildinfo
+next-env.d.ts
+.vscode/*
+!.vscode/extensions.json

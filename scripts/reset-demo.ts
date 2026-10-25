@@ -1,0 +1,32 @@
+// Removes the fictional demo data so it can be seeded again.
+//   npm run db:reset-demo                      removes only UNCLAIMED fictional records (safe: no student loses data)
+//   npm run db:reset-demo -- --include-claimed also removes fictional records students have claimed (they lose their workspace)
+// Real accounts, admin accounts and anything that is not marked synthetic are never touched.
+import { adminClient, chunk, fail, loadEnvFiles } from './lib/common';
+
+loadEnvFiles();
+
+async function main() {
+  const includeClaimed = process.argv.includes('--include-claimed');
+  const db = adminClient();
+
+  let q = db.from('admission_workspaces').select('id, cap_id').eq('is_synthetic', true).like('cap_id', 'DM26%').limit(5000);
+  if (!includeClaimed) q = q.is('user_id', null);
+  const { data: workspaces, error } = await q;
+  if (error) fail(`read workspaces: ${error.message}`);
+  const capIds = (workspaces ?? []).map((w: { cap_id: string }) => w.cap_id);
+  const ids = (workspaces ?? []).map((w: { id: string }) => w.id);
+
+  for (const part of chunk(ids, 100)) {
+    const r = await db.from('admission_workspaces').delete().in('id', part);
+    if (r.error) fail(`delete workspaces: ${r.error.message}`);
+  }
+  for (const part of chunk(capIds, 100)) {
+    const r = await db.from('cap_records').delete().eq('is_synthetic', true).in('cap_id', part);
+    if (r.error) fail(`delete records: ${r.error.message}`);
+  }
+  console.log(`Removed ${ids.length} fictional workspaces and their records${includeClaimed ? ' (including claimed ones)' : ' (claimed ones were kept)'}.`);
+  console.log('The college catalogue and the round dates were kept. Run "npm run db:seed" to add the demo data again.');
+}
+
+main().catch((e) => fail(`Reset failed: ${e instanceof Error ? e.message : String(e)}`));
