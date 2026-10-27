@@ -23,7 +23,11 @@ export default async function AdminDashboard() {
     count(db, 'appointments', (q) => q.eq('status', 'scheduled')),
   ]);
   const audit = await db.from('audit_logs').select('id, action, entity_type, note, created_at').order('id', { ascending: false }).limit(8);
+<<<<<<< HEAD
   const health = await engine.health().then((h) => ({ ok: h.selfCheck, name: h.mode === 'cpp' ? 'C++ program (cpp/build/engine)' : 'TypeScript copy of the engine steps (C++ program not built here)' })).catch(() => ({ ok: false, name: 'not available' }));
+=======
+  const health = await engine.health().then((h) => ({ ok: h.selfCheck, name: h.engine })).catch(() => ({ ok: false, name: 'not available' }));
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
   const cards: [string, number, string, string][] = [
     ['Registered students', students, '/admin/students', 'total'],
     ['CAP records', records, '/admin/records', 'approved'],
@@ -50,9 +54,15 @@ export default async function AdminDashboard() {
           </section>
         </div>
         <div className="col-lg-4">
+<<<<<<< HEAD
           <section className="panel"><h2 className="panel-title">Engine</h2>
             <p className="mb-1"><span className={`status-pill ${health.ok ? 'completed' : 'rejected'}`}>{health.ok ? 'running' : 'not available'}</span></p>
             <p className="small text-muted mb-0">Running: {health.name}. It does the searching, sorting, queue/stack steps and the allotment; everything else is Next.js.</p>
+=======
+          <section className="panel"><h2 className="panel-title">C++ engine</h2>
+            <p className="mb-1"><span className={`status-pill ${health.ok ? 'completed' : 'rejected'}`}>{health.ok ? 'running' : 'not available'}</span></p>
+            <p className="small text-muted mb-0">{health.name}. Search, sorting, queueing, undo, planning and allotment run in this executable.</p>
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
           </section>
         </div>
       </div>

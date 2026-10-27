@@ -21,8 +21,13 @@ export default async function AdminLoginPage({ searchParams }: { searchParams: P
       </header>
       <main className="auth-wrap" id="main">
         <h1 className="page-title mb-1">Admin log in</h1>
+<<<<<<< HEAD
         <p className="text-muted mb-4">For college admission cell staff.</p>
         <LoginForm admin notice={notice} />
+=======
+        <p className="text-muted mb-4">For college admission cell staff. Admin accounts are created by the administrator, never through registration.</p>
+        <LoginForm demo={false} admin notice={notice} />
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
         <p className="text-center small mt-4">
           <Link href="/login">Student? Log in with your CAP ID</Link>
         </p>

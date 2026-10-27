@@ -1,9 +1,13 @@
 // Deterministic generator for the fictional demo data. No real student, college or merit-list data is used.
 // The same seed always produces the same 500 candidates, so the seed script can be run again safely.
 
+<<<<<<< HEAD
 // Same shape as real application IDs (2 letters + 2-digit year + 6 digits, e.g. EN24133045) but year 26 and
 // all numbers are invented. Names/numbers are NOT taken from any real list.
 export const DEMO_PREFIX = 'EN26';
+=======
+export const DEMO_PREFIX = 'DM26';
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
 export const DEMO_COUNT = 500;
 
 /** mulberry32: small, fast, deterministic PRNG. */
@@ -18,6 +22,7 @@ export function makeRng(seed: number): () => number {
   };
 }
 
+<<<<<<< HEAD
 const FIRST_M = ['AARAV', 'VIHAAN', 'ADITYA', 'ARJUN', 'ISHAAN', 'KABIR', 'REYANSH', 'SAI', 'ROHAN', 'YASH', 'PRANAV', 'SIDDHARTH', 'OM', 'HARSH', 'ATHARV', 'SHREYAS', 'ONKAR', 'TEJAS', 'OMKAR', 'PRATHAMESH', 'ANIKET', 'SWAPNIL', 'AMEY', 'DHRUV', 'KARTIK', 'MAYUR', 'NIKHIL', 'RUSHIKESH', 'SAURABH', 'VEDANT'];
 const FIRST_F = ['ANANYA', 'DIYA', 'ISHA', 'KAVYA', 'MEERA', 'NISHA', 'PRIYA', 'RIYA', 'SAANVI', 'TARA', 'TANVI', 'UMA', 'VEDA', 'ZOYA', 'SAMRUDDHI', 'PRERANA', 'SHRAVANI', 'AISHWARYA', 'GAYATRI', 'PRAJAKTA', 'RUTUJA', 'SNEHAL', 'VAISHNAVI', 'APURVA', 'MRUNMAYEE', 'SAKSHI', 'TANMAYI', 'ADITI', 'POOJA', 'SHRUTI'];
 const FATHER = ['SUNIL', 'SACHIN', 'RAJESH', 'SANJAY', 'MILIND', 'ANIL', 'VIJAY', 'PRAKASH', 'DINESH', 'SURESH', 'MAHESH', 'RAVINDRA', 'ASHOK', 'NITIN', 'PRASAD', 'SUDHAKAR', 'DILIP', 'RAMESH', 'SANTOSH', 'AMOL', 'VINAY', 'MANOJ', 'YOGESH', 'SHRIKANT', 'HEMANT'];
@@ -33,6 +38,11 @@ function pickCategory(r: number): string {
   }
   return 'Open';
 }
+=======
+const FIRST = ['Aarav', 'Vihaan', 'Aditya', 'Arjun', 'Ishaan', 'Kabir', 'Reyansh', 'Sai', 'Rohan', 'Yash', 'Ananya', 'Diya', 'Isha', 'Kavya', 'Meera', 'Nisha', 'Priya', 'Riya', 'Saanvi', 'Tara', 'Neel', 'Om', 'Pranav', 'Siddharth', 'Tanvi', 'Uma', 'Veda', 'Zoya', 'Dev', 'Harsh'];
+const LAST = ['Kulkarni', 'Patil', 'Deshmukh', 'Joshi', 'Pawar', 'Shinde', 'Gaikwad', 'More', 'Jadhav', 'Bhosale', 'Kale', 'Naik', 'Sawant', 'Chavan', 'Thakur', 'Mehta', 'Rao', 'Iyer', 'Nair', 'Khan', 'Shaikh', 'Verma', 'Gupta', 'Das', 'Bose', 'Menon', 'Reddy', 'Singh', 'Pillai', 'Wagh'];
+const CATEGORIES = ['OPEN', 'OBC', 'SC', 'ST', 'EWS', 'VJ/NT'];
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
 
 // Clearly fictional institutions (the "(Demo)" suffix is part of the name on purpose).
 const COLLEGES: [string, string][] = [
@@ -79,7 +89,11 @@ export function buildCourses(): DemoCourse[] {
 }
 
 export function capIdFor(index: number): string {
+<<<<<<< HEAD
   return `${DEMO_PREFIX}${String(100000 + index)}`;
+=======
+  return `${DEMO_PREFIX}${String(index).padStart(6, '0')}`;
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
 }
 
 export function buildStudents(courseCount: number, count = DEMO_COUNT, seed = 20260101): DemoStudent[] {
@@ -89,10 +103,15 @@ export function buildStudents(courseCount: number, count = DEMO_COUNT, seed = 20
   for (let i = 1; i <= count; i++) {
     let name = '';
     do {
+<<<<<<< HEAD
       // merit-list style: SURNAME FIRSTNAME FATHERNAME
       const first = rng() < 0.5 ? FIRST_M : FIRST_F;
       name = `${LAST[Math.floor(rng() * LAST.length)]} ${first[Math.floor(rng() * first.length)]} ${FATHER[Math.floor(rng() * FATHER.length)]}`;
     } while (used.has(name));
+=======
+      name = `${FIRST[Math.floor(rng() * FIRST.length)]} ${LAST[Math.floor(rng() * LAST.length)]}`;
+    } while (used.has(name) && used.size < FIRST.length * LAST.length);
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
     used.add(name);
     const prefCount = 5 + Math.floor(rng() * 6);
     const picks = new Set<number>();
@@ -102,10 +121,16 @@ export function buildStudents(courseCount: number, count = DEMO_COUNT, seed = 20
       index: i,
       capId: capIdFor(i),
       name,
+<<<<<<< HEAD
       category: pickCategory(rng()),
       rank: i, // index order is merit order
       // top of a real list is 99.9+; strictly decreasing with rank (step 0.0016 > noise 0.0005)
       percentile: Math.round((100 - (i - 1) * 0.0016 - rng() * 0.0005) * 1e7) / 1e7,
+=======
+      category: CATEGORIES[Math.floor(rng() * CATEGORIES.length)],
+      rank: i, // index order is merit order
+      percentile: Math.round((100 - ((i - 1) / count) * 62 - rng() * 0.05) * 1e7) / 1e7,
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
       verified: rng() < 0.92,
       prefIndexes: [...picks],
     });
@@ -114,6 +139,7 @@ export function buildStudents(courseCount: number, count = DEMO_COUNT, seed = 20
 }
 
 export const STAGE_PATH = ['registration', 'profile_verification', 'preference_preparation', 'allotment_recorded'] as const;
+<<<<<<< HEAD
 
 // ---- demo logins -------------------------------------------------------------------------------------------
 // Every demo student logs in with the CAP ID and, as password, the same CAP ID (see demo-data/dummy_students_500.csv).
@@ -124,3 +150,5 @@ export const titleName = (name: string): string => name.toLowerCase().replace(/\
 
 // Fixed admin for the demo. This is a dummy account: the credentials are public in the README on purpose.
 export const DEMO_ADMIN = { loginId: 'admin', password: 'Admin@123', email: 'admin@admitqueue.example.com', fullName: 'Admission Cell Admin' };
+=======
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52

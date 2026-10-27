@@ -9,7 +9,11 @@ const schema = z.object({ round: z.union([z.literal(1), z.literal(2)]), apply: z
 const STATUS = ['not_allotted', 'allotted', 'waiting', 'frozen', 'cancelled'] as const;
 
 /**
+<<<<<<< HEAD
  * Runs the allotment simulation (arrays + queue + bubble sort, see cpp/engine/main.cpp) on the records and
+=======
+ * Runs the Project (1) allotment simulation (linked list + FIFO queue + bubble sort, in C++) on the records and
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
  * preferences stored here. A dry run only shows what would change. Applying goes through audited, undoable edits.
  * This is a classroom simulation, NOT the official CET Cell allotment.
  */
@@ -42,11 +46,18 @@ export const POST = route(async (request) => {
   const filled = new Map<number, number>();
   if (b.round === 2) for (const s of students) if (s.status === 1 || s.status === 3) filled.set(s.allotment, (filled.get(s.allotment) ?? 0) + 1);
   const result = await engine.allotment({
+<<<<<<< HEAD
     round: b.round,
     courses: courses.map((c, i) => ({ id: i + 1, seats: c.demo_seats as number, filled: filled.get(i + 1) ?? 0 })),
     students: students.map((s) => ({ id: s.id, rank: s.rank, verified: s.verified, prefs: s.prefs, status: s.status, allotment: s.allotment, prefNo: s.prefNo })),
   });
   const message = `Round ${b.round}: ${result.students.filter((s) => s.status === 1).length} allotted, ${result.waiting.length} on the waiting list.`;
+=======
+    action: b.round === 1 ? 'round1' : 'round2',
+    courses: courses.map((c, i) => ({ id: i + 1, label: c.code as string, seats: c.demo_seats as number, filled: filled.get(i + 1) ?? 0 })),
+    students: students.map((s) => ({ id: s.id, name: s.name, rank: s.rank, verified: s.verified, prefs: s.prefs, status: s.status, allotment: s.allotment, prefNo: s.prefNo, round: s.round })),
+  });
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
 
   const byId = new Map(students.map((s) => [s.id, s._rec]));
   const changes = result.students.flatMap((s) => {
@@ -72,5 +83,9 @@ export const POST = route(async (request) => {
       applied++;
     }
   }
+<<<<<<< HEAD
   return ok({ message, considered: students.length, changeCount: changes.length, applied, sample: changes.slice(0, 15), waiting: result.waiting.length });
+=======
+  return ok({ message: result.message, considered: students.length, changeCount: changes.length, applied, sample: changes.slice(0, 15), waiting: result.waiting.length });
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
 });

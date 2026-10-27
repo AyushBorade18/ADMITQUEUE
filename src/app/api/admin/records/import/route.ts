@@ -7,7 +7,11 @@ import { engine } from '@/lib/engine/ops';
 export const dynamic = 'force-dynamic';
 const schema = z.object({ csv: z.string().max(400_000), dryRun: z.boolean().optional() });
 
+<<<<<<< HEAD
 /** CSV columns: cap_id,name,category,merit_rank,percentile. The engine's linear search classifies every CAP ID. */
+=======
+/** CSV columns: cap_id,name,category,merit_rank,percentile. The C++ hash table classifies every CAP ID. */
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
 export const POST = route(async (request) => {
   const { supabase, user } = await requireAdminApi();
   const b = await readJson(request, schema);
@@ -30,7 +34,11 @@ export const POST = route(async (request) => {
     else parsed.push({ capId, name, category: cat || null, rank: rankN, pct: pctN });
   });
 
+<<<<<<< HEAD
   const existingRows = await supabase.from('cap_records').select('cap_id').limit(5000);
+=======
+  const existingRows = await supabase.from('cap_records').select('cap_id').limit(20000);
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
   if (existingRows.error) throw new Error(existingRows.error.message);
   const check = await engine.importCheck((existingRows.data ?? []).map((r) => r.cap_id as string), parsed.map((p) => p.capId));
   const fresh = parsed.filter((_, i) => check.status[i] === 'new');

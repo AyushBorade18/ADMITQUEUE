@@ -1,0 +1,4 @@
+#ifndef ADMITFLOW_ADMISSION_PROGRESS_HEAP_HPP
+#define ADMITFLOW_ADMISSION_PROGRESS_HEAP_HPP
+#include "progress_queue.h"
+#endif

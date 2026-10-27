@@ -10,6 +10,7 @@ async function main() {
   const includeClaimed = process.argv.includes('--include-claimed');
   const db = adminClient();
 
+<<<<<<< HEAD
   // current demo IDs start with EN26 (older versions of this project used DM26)
   const workspaces: { id: string; cap_id: string }[] = [];
   for (const prefix of ['EN26', 'DM26']) {
@@ -34,6 +35,15 @@ async function main() {
       }
     }
   }
+=======
+  let q = db.from('admission_workspaces').select('id, cap_id').eq('is_synthetic', true).like('cap_id', 'DM26%').limit(5000);
+  if (!includeClaimed) q = q.is('user_id', null);
+  const { data: workspaces, error } = await q;
+  if (error) fail(`read workspaces: ${error.message}`);
+  const capIds = (workspaces ?? []).map((w: { cap_id: string }) => w.cap_id);
+  const ids = (workspaces ?? []).map((w: { id: string }) => w.id);
+
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
   for (const part of chunk(ids, 100)) {
     const r = await db.from('admission_workspaces').delete().in('id', part);
     if (r.error) fail(`delete workspaces: ${r.error.message}`);
@@ -42,7 +52,11 @@ async function main() {
     const r = await db.from('cap_records').delete().eq('is_synthetic', true).in('cap_id', part);
     if (r.error) fail(`delete records: ${r.error.message}`);
   }
+<<<<<<< HEAD
   console.log(`Removed ${ids.length} fictional workspaces and their records${includeClaimed ? ` (including claimed ones and ${loginsRemoved} demo logins)` : ' (claimed ones were kept)'}.`);
+=======
+  console.log(`Removed ${ids.length} fictional workspaces and their records${includeClaimed ? ' (including claimed ones)' : ' (claimed ones were kept)'}.`);
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
   console.log('The college catalogue and the round dates were kept. Run "npm run db:seed" to add the demo data again.');
 }
 

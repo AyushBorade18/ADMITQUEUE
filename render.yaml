@@ -1,16 +1,28 @@
 # Render Blueprint: one native Node web service (no Docker).
+<<<<<<< HEAD
 # NOT deployed or tested from this repository's build environment. After the first deploy open:
 #   /api/health          (site is up)
 #   /api/health/engine   ("mode":"cpp" = the C++ program runs; "mode":"typescript" = it could not be built, the
 #                         TypeScript copy of the same steps answers instead)
+=======
+# NOT deployed or tested from this repository's build environment. Follow SETUP_FROM_ZERO.md and check the
+# two health URLs after the first deploy:  /api/health  and  /api/health/engine
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
 services:
   - type: web
     name: admitqueue
     runtime: node
     plan: free
+<<<<<<< HEAD
     # "--include=dev" because the build needs TypeScript. "npm run build" compiles cpp/engine/main.cpp with g++
     # (a missing compiler only prints a warning) and then builds the website.
     buildCommand: npm ci --include=dev && npm run build
+=======
+    # "--include=dev" because the build needs TypeScript and the scripts need tsx. The build step compiles the
+    # C++ engine with g++ (scripts/build-engine.mjs fails the build with a clear message if g++ is missing),
+    # runs its self check, then builds the website.
+    buildCommand: npm ci --include=dev && node scripts/build-engine.mjs --check && npm run build
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
     startCommand: npm start
     healthCheckPath: /api/health
     autoDeploy: true
@@ -25,3 +37,14 @@ services:
         sync: false
       - key: NEXT_PUBLIC_APP_URL
         sync: false
+<<<<<<< HEAD
+=======
+      - key: DEMO_MODE
+        value: "true"
+      - key: ADMIN_LOGIN_ID
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52

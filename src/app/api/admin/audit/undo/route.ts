@@ -7,7 +7,11 @@ import { engine } from '@/lib/engine/ops';
 export const dynamic = 'force-dynamic';
 
 /**
+<<<<<<< HEAD
  * Undo works like an undo button: only the NEWEST undoable action of this admin can be undone. The engine's stack
+=======
+ * Undo works like an undo button: only the NEWEST undoable action of this admin can be undone. The C++ stack
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
  * decides which one that is; the database then re-checks that nothing changed after it.
  */
 export const POST = route(async (request) => {
@@ -15,8 +19,14 @@ export const POST = route(async (request) => {
   const b = await readJson(request, z.object({ id: z.number().int().positive() }));
   const rows = await supabase.from('audit_logs').select('id').eq('actor_id', user.id).eq('undoable', true).is('undone_at', null).order('id', { ascending: true }).limit(200);
   if (rows.error) throw new Error(rows.error.message);
+<<<<<<< HEAD
   const top = await engine.undoTop((rows.data ?? []).map((r) => Number(r.id)));
   if (top !== b.id) throw new ApiError(409, 'not_latest', 'Only your most recent change can be undone.');
+=======
+  const entries = (rows.data ?? []).map((r) => ({ actionId: Number(r.id) }));
+  const top = await engine.undoStack({ action: 'peek', capacity: 200, adminId: 0, entries });
+  if (!top.entry || top.entry.actionId !== b.id) throw new ApiError(409, 'not_latest', 'Only your most recent change can be undone.');
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
   const { error } = await supabase.rpc('undo_audit_action', { p_audit_id: b.id });
   if (error) rpcError(error);
   return ok({});

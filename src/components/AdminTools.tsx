@@ -24,7 +24,11 @@ export function CsvImport() {
   return (
     <div>
       <label className="form-label" htmlFor="csv">Paste CSV rows: cap_id,name,category,merit_rank,percentile</label>
+<<<<<<< HEAD
       <textarea id="csv" className="form-control mb-2" rows={5} value={csv} onChange={(e) => setCsv(e.target.value)} placeholder="EN26900001,Test Student,OPEN,901,45.5" />
+=======
+      <textarea id="csv" className="form-control mb-2" rows={5} value={csv} onChange={(e) => setCsv(e.target.value)} placeholder="DM26900001,Test Student,OPEN,901,45.5" />
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
       <div className="d-flex gap-2 mb-2">
         <Button type="button" className="btn btn-outline-primary btn-sm" loading={busy} disabled={!csv.trim()} onClick={() => run(true)}>Check only</Button>
         <Button type="button" className="btn btn-primary btn-sm" loading={busy} disabled={!csv.trim()} onClick={() => run(false)}>Import</Button>

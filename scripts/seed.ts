@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // Seeds the demo database:
 //   * 500 fictional CAP records (EN26100001 - EN26100500) with preferences, documents, appointments, queue items
 //   * a fictional college catalogue
@@ -31,6 +32,20 @@ function round1(courses: { seats: number }[], students: { index: number; rank: n
     }),
   };
 }
+=======
+// Seeds 500 fictional CAP records (DM26000001 - DM26000500) plus a fictional college catalogue.
+// Idempotent: running it again inserts only what is missing and never changes rows that already exist
+// (so a student's saved preferences/documents are never overwritten).
+//   npm run db:seed
+import { runEngine } from '../src/lib/engine/client';
+import { adminClient, chunk, fail, loadEnvFiles } from './lib/common';
+import { DEMO_COUNT, DEMO_PREFIX, STAGE_PATH, buildCourses, buildStudents, capIdFor, makeRng } from './lib/dataset';
+
+loadEnvFiles();
+
+type EngineStudent = { id: number; status: number; allotment: number | null; prefNo: number; round: number; remark: string };
+type EngineResult = { students: EngineStudent[] };
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
 const STATUS = ['not_allotted', 'allotted', 'waiting', 'frozen', 'cancelled'] as const;
 
 function must<T>(label: string, res: { data: T | null; error: { message: string } | null }): T {
@@ -38,6 +53,7 @@ function must<T>(label: string, res: { data: T | null; error: { message: string 
   return res.data as T;
 }
 
+<<<<<<< HEAD
 /** Runs `fn` over `items` with a few requests at a time. */
 async function pool<T>(items: T[], size: number, fn: (item: T) => Promise<void>): Promise<void> {
   let next = 0;
@@ -133,6 +149,8 @@ async function createLogins(db: SupabaseClient, students: { capId: string; name:
   void linked;
 }
 
+=======
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
 async function main() {
   const db = adminClient();
   const stats: Record<string, { inserted: number; skipped: number }> = {};
@@ -157,9 +175,19 @@ async function main() {
   note('cap_records', fresh.length, students.length - fresh.length);
 
   if (fresh.length > 0) {
+<<<<<<< HEAD
     // ---- round-1 allotment (same steps as the engine). All 500 are always passed in so the result does not
     // depend on which ones happen to be new.
     const result = round1(courses.map((c) => ({ seats: c.demo_seats })), students);
+=======
+    // ---- round-1 allotment computed by the real C++ engine (Project (1) linked-list/queue logic) ----
+    // All 500 are always passed in so the result does not depend on which ones happen to be new.
+    const result = await runEngine<EngineResult>('allotment', {
+      action: 'round1',
+      courses: courses.map((c, i) => ({ id: i + 1, label: c.code, seats: c.demo_seats })),
+      students: students.map((s) => ({ id: s.index, name: s.name, rank: s.rank, verified: s.verified, prefs: s.prefIndexes })),
+    }, 30000).catch((e: Error) => fail(`The C++ engine could not run the seed allotment: ${e.message}\nBuild it first with: npm run build:engine`));
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
     const byId = new Map(result.students.map((s) => [s.id, s]));
 
     const rows = fresh.map((s) => {
@@ -197,15 +225,24 @@ async function main() {
     note('admission_workspaces', fresh.length, students.length - fresh.length);
 
     // Extras (preferences, stage, events, history, documents, appointments) are written once per workspace.
+<<<<<<< HEAD
     // A workspace that already has events is left exactly as it is, so a rerun after a crash completes the
     // work and a rerun never overwrites what somebody changed.
+=======
+    // A workspace that already has seeded events, or that a student has claimed, is left exactly as it is,
+    // so a rerun after a crash completes the work and a rerun after claiming never overwrites a student's changes.
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
     const withEvents = new Set<string>();
     for (const part of chunk([...ws.values()].map((w) => w.id), 100)) {
       for (const e of must<{ workspace_id: string }[]>('read events', await db.from('workflow_events').select('workspace_id').in('workspace_id', part))) withEvents.add(e.workspace_id);
     }
     const todo = students.filter((s) => {
       const w = ws.get(s.capId);
+<<<<<<< HEAD
       return w && rec.has(s.capId) && !withEvents.has(w.id);
+=======
+      return w && rec.has(s.capId) && w.user_id === null && !withEvents.has(w.id);
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
     });
 
     // ---- preferences ----
@@ -287,8 +324,11 @@ async function main() {
   if (had.length === 0) must('insert settings', await db.from('app_settings').insert({ key: 'cap_rounds', value: rounds }));
   note('app_settings', had.length === 0 ? 1 : 0, had.length === 0 ? 0 : 1);
 
+<<<<<<< HEAD
   await createLogins(db, students.map((s) => ({ capId: s.capId, name: s.name })), note);
 
+=======
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
   console.log(`Seed finished (${DEMO_COUNT} fictional records ${capIdFor(1)} - ${capIdFor(DEMO_COUNT)}).`);
   for (const [k, v] of Object.entries(stats)) console.log(`  ${k.padEnd(22)} inserted ${String(v.inserted).padStart(5)}   already there ${String(v.skipped).padStart(5)}`);
 }

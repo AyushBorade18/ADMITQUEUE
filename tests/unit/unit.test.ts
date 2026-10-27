@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { isValidCapId, normalizeCapId, parseAdminLoginId, parseCapId } from '../../src/lib/capId';
+<<<<<<< HEAD
 import { existsSync } from 'node:fs';
 import { EngineError, resolveEnginePath, runCpp } from '../../src/lib/engine/client';
 import { runFallback } from '../../src/lib/engine/fallback';
@@ -10,17 +11,35 @@ import { adminLoginSchema, loginSchema } from '../../src/lib/auth/schemas';
 describe('CAP ID normalization', () => {
   it('accepts any style and returns one canonical form', () => {
     for (const v of ['en26100001', ' EN26 100001 ', 'en26-100001', 'EN26.100001', 'ＥＮ26100001']) expect(parseCapId(v)).toBe('EN26100001');
+=======
+import { EngineError, runEngine } from '../../src/lib/engine/client';
+import { engine } from '../../src/lib/engine/ops';
+import { buildCourses, buildStudents } from '../../scripts/lib/dataset';
+import { loginSchema, registerSchema } from '../../src/lib/auth/schemas';
+
+describe('CAP ID normalization', () => {
+  it('accepts any style and returns one canonical form', () => {
+    for (const v of ['dm26000001', ' DM26 000001 ', 'dm26-000001', 'DM26.000001', 'ＤＭ26000001']) expect(parseCapId(v)).toBe('DM26000001');
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
   });
   it('rejects too short, too long, empty and non-strings', () => {
     expect(parseCapId('abc')).toBeNull();
     expect(parseCapId('A'.repeat(21))).toBeNull();
     expect(parseCapId('   ')).toBeNull();
     expect(parseCapId(null)).toBeNull();
+<<<<<<< HEAD
     expect(parseCapId({ toString: () => 'EN26100001' })).toBeNull();
     expect(parseCapId('x'.repeat(100))).toBeNull();
   });
   it('strips characters that could be used for injection', () => {
     expect(normalizeCapId("EN26'; drop table--")).toBe('EN26DROPTABLE');
+=======
+    expect(parseCapId({ toString: () => 'DM26000001' })).toBeNull();
+    expect(parseCapId('x'.repeat(100))).toBeNull();
+  });
+  it('strips characters that could be used for injection', () => {
+    expect(normalizeCapId("DM26'; drop table--")).toBe('DM26DROPTABLE');
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
     expect(isValidCapId(normalizeCapId('1 OR 1=1'))).toBe(false);
   });
   it('admin login ids are lower-case short names', () => {
@@ -32,11 +51,25 @@ describe('CAP ID normalization', () => {
 
 describe('input schemas', () => {
   it('login needs both fields', () => {
+<<<<<<< HEAD
     expect(loginSchema.safeParse({ capId: 'EN26100001', password: '' }).success).toBe(false);
     expect(loginSchema.safeParse({ capId: 'EN26100001', password: 'x' }).success).toBe(true);
   });
   it('admin login accepts the demo admin', () => {
     expect(adminLoginSchema.safeParse({ loginId: DEMO_ADMIN.loginId, password: DEMO_ADMIN.password }).success).toBe(true);
+=======
+    expect(loginSchema.safeParse({ capId: 'DM26000001', password: '' }).success).toBe(false);
+    expect(loginSchema.safeParse({ capId: 'DM26000001', password: 'x' }).success).toBe(true);
+  });
+  it('registration enforces password rules and matching confirmation', () => {
+    const base = { fullName: 'A B', email: 'A@Example.com', capId: 'DM26000001', password: 'abcdefg1', confirmPassword: 'abcdefg1' };
+    const ok = registerSchema.safeParse(base);
+    expect(ok.success).toBe(true);
+    if (ok.success) expect(ok.data.email).toBe('a@example.com');
+    expect(registerSchema.safeParse({ ...base, password: 'abcdefgh', confirmPassword: 'abcdefgh' }).success).toBe(false);
+    expect(registerSchema.safeParse({ ...base, confirmPassword: 'other123' }).success).toBe(false);
+    expect(registerSchema.safeParse({ ...base, email: 'nope' }).success).toBe(false);
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
   });
 });
 
@@ -47,9 +80,14 @@ describe('demo dataset', () => {
     expect(a).toEqual(b);
     expect(a).toHaveLength(500);
     expect(new Set(a.map((s) => s.capId)).size).toBe(500);
+<<<<<<< HEAD
     expect(new Set(a.map((s) => s.name)).size).toBe(500);
     expect(a[0].capId).toBe('EN26100001');
     expect(a[499].capId).toBe('EN26100500');
+=======
+    expect(a[0].capId).toBe('DM26000001');
+    expect(a[499].capId).toBe('DM26000500');
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
     for (const s of a) {
       expect(isValidCapId(s.capId)).toBe(true);
       expect(new Set(s.prefIndexes).size).toBe(s.prefIndexes.length);
@@ -61,6 +99,7 @@ describe('demo dataset', () => {
   it('contains no real institution names (every college is marked as a demo)', () => {
     for (const c of buildCourses()) expect(c.college_name).toContain('(Demo)');
   });
+<<<<<<< HEAD
   it('demo login: password is the CAP ID and the sign-in address is derived from it', () => {
     expect(passwordFor(capIdFor(7))).toBe('EN26100007');
     expect(emailFor('EN26100007')).toBe('en26100007@students.example.com');
@@ -105,11 +144,42 @@ describe('engine (C++ program, or the TypeScript copy when it is not built)', ()
         { id: 2, rank: 1, verified: true, prefs: [1, 2] },
         { id: 3, rank: 2, verified: true, prefs: [1, 2] },
         { id: 4, rank: 4, verified: false, prefs: [1, 2] },
+=======
+});
+
+describe('C++ engine through the Node subprocess client', () => {
+  it('health reports ok with a passing self check', async () => {
+    const h = await engine.health();
+    expect(h.status).toBe('ok');
+    expect(h.selfCheck).toBe(true);
+    expect(h.ops).toEqual(expect.arrayContaining(['search', 'queue_step', 'allotment', 'import_check']));
+  });
+  it('hash-table import check classifies new / repeated / existing IDs', async () => {
+    const r = await engine.importCheck(['A00001'], ['A00001', 'B00002', 'B00002', 'C00003']);
+    expect(r.status).toEqual(['already_exists', 'new', 'duplicate_in_file', 'new']);
+  });
+  it('merge sort is stable and the heap-based queue serves priority before regular', async () => {
+    const s = await engine.rankWorklist('arrivals_priority', [
+      { id: 1, level: 3, minutes: 10 }, { id: 2, level: 1, minutes: 20 }, { id: 3, level: 3, minutes: 5 }, { id: 4, level: 1, minutes: 20 },
+    ]);
+    expect(s.order[0]).toBe(2);
+    expect(s.stats.algorithm).toBe('merge sort');
+  });
+  it('allotment simulation never exceeds seats and respects merit order', async () => {
+    const r = await engine.allotment({
+      action: 'round1',
+      courses: [{ id: 1, label: 'C1', seats: 1 }, { id: 2, label: 'C2', seats: 1 }],
+      students: [
+        { id: 1, name: 'low', rank: 3, verified: true, prefs: [1, 2] },
+        { id: 2, name: 'top', rank: 1, verified: true, prefs: [1, 2] },
+        { id: 3, name: 'mid', rank: 2, verified: true, prefs: [1, 2] },
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
       ],
     });
     const by = new Map(r.students.map((s) => [s.id, s]));
     expect(by.get(2)!.allotment).toBe(1);
     expect(by.get(3)!.allotment).toBe(2);
+<<<<<<< HEAD
     expect(by.get(1)!.allotment).toBeNull();
     expect(by.get(1)!.status).toBe(2);
     expect(by.get(4)!.status).toBe(0);
@@ -143,11 +213,26 @@ describe('engine (C++ program, or the TypeScript copy when it is not built)', ()
       const h = await engine.health();
       expect(h.mode).toBe('typescript');
       expect(h.selfCheck).toBe(true);
+=======
+    expect(by.get(1)!.allotment).toBeFalsy();
+    for (const c of r.courses) expect(c.filled).toBeLessThanOrEqual(c.seats);
+  });
+  it('bad requests come back as safe, typed errors', async () => {
+    await expect(runEngine('no_such_op', {})).rejects.toBeInstanceOf(EngineError);
+    await expect(engine.search('app_prefix', 'x'.repeat(200), [])).rejects.toBeInstanceOf(EngineError);
+  });
+  it('a missing executable is reported as unavailable, without leaking the path to callers of the API', async () => {
+    const old = process.env.ENGINE_PATH;
+    process.env.ENGINE_PATH = '/nonexistent/engine';
+    try {
+      await expect(engine.health()).rejects.toMatchObject({ kind: 'unavailable' });
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
     } finally {
       if (old === undefined) delete process.env.ENGINE_PATH; else process.env.ENGINE_PATH = old;
     }
   });
 });
+<<<<<<< HEAD
 
 // Only meaningful when cpp/build/engine exists (npm run build:engine): both must print exactly the same lines.
 describe.runIf(existsSync(resolveEnginePath()))('C++ program and TypeScript copy give identical answers', () => {
@@ -175,3 +260,5 @@ describe.runIf(existsSync(resolveEnginePath()))('C++ program and TypeScript copy
     expect(runFallback(input)).toEqual(await runCpp(input));
   });
 });
+=======
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52

@@ -1,6 +1,10 @@
 // Starts the whole system for end-to-end tests:
 //   real PostgreSQL (migrations applied) <- Supabase emulator (tests/support/emulator.ts) <- the REAL production build
+<<<<<<< HEAD
 //   of the Next.js app (`next start`) with the REAL C++ engine. The seed (records + 500 logins + admin) runs as the real script.
+=======
+//   of the Next.js app (`next start`) with the REAL C++ engine. Seed and admin bootstrap run as the real scripts.
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
 // Requires: a local PostgreSQL, `npm run build` done once, and the C++ engine built (`npm run build:engine`).
 import { spawn, type ChildProcess } from 'node:child_process';
 import { createWriteStream } from 'node:fs';
@@ -11,14 +15,24 @@ import { startEmulator, TEST_KEYS, type Emulator } from './emulator';
 
 const root = path.resolve(__dirname, '..', '..');
 export const EMU_PORT = 54399;
+<<<<<<< HEAD
 import { DEMO_ADMIN } from '../../scripts/lib/dataset';
 export const ADMIN = { loginId: DEMO_ADMIN.loginId, password: DEMO_ADMIN.password };
+=======
+export const ADMIN = { loginId: 'staffadmin', email: 'staffadmin@example.test', password: 'Correct-Horse-Battery-9' };
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
 
 export type Stack = {
   db: Awaited<ReturnType<typeof createTestDb>>;
   emulator: Emulator;
+<<<<<<< HEAD
   demoUrl: string;
   noEngineUrl: string; // C++ executable missing -> TypeScript copy answers
+=======
+  demoUrl: string; // DEMO_MODE=true
+  strictUrl: string; // DEMO_MODE=false
+  noEngineUrl: string; // engine executable missing
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
   seedOutput: string[];
   envFor: (extra?: Record<string, string>) => NodeJS.ProcessEnv;
   stop: () => Promise<void>;
@@ -30,6 +44,12 @@ export function envFor(extra: Record<string, string> = {}): NodeJS.ProcessEnv {
     NEXT_PUBLIC_SUPABASE_URL: `http://127.0.0.1:${EMU_PORT}`,
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: TEST_KEYS.publishable,
     SUPABASE_SECRET_KEY: TEST_KEYS.secret,
+<<<<<<< HEAD
+=======
+    ADMIN_LOGIN_ID: ADMIN.loginId,
+    ADMIN_EMAIL: ADMIN.email,
+    ADMIN_PASSWORD: ADMIN.password,
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
     ...extra,
   } as NodeJS.ProcessEnv;
 }
@@ -41,7 +61,11 @@ export function runScript(script: string, env: NodeJS.ProcessEnv): Promise<{ cod
     let out = '';
     child.stdout.on('data', (d) => (out += d));
     child.stderr.on('data', (d) => (out += d));
+<<<<<<< HEAD
     const timer = setTimeout(() => child.kill('SIGKILL'), 400_000);
+=======
+    const timer = setTimeout(() => child.kill('SIGKILL'), 180_000);
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
     child.on('close', (code) => { clearTimeout(timer); resolve({ code: code ?? 1, out }); });
   });
 }
@@ -83,15 +107,27 @@ export async function startStack(dbName = 'aq_e2e'): Promise<Stack> {
   try {
     seed = await runScript('scripts/seed.ts', env);
     if (seed.code !== 0) throw new Error(`seed failed:\n${seed.out}`);
+<<<<<<< HEAD
     servers.push(await startNext(3101, {}));
     servers.push(await startNext(3103, { ENGINE_PATH: '/nonexistent/engine' }));
+=======
+    const boot = await runScript('scripts/bootstrap-admin.ts', env);
+    if (boot.code !== 0) throw new Error(`bootstrap failed:\n${boot.out}`);
+    servers.push(await startNext(3101, { DEMO_MODE: 'true' }));
+    servers.push(await startNext(3102, { DEMO_MODE: 'false' }));
+    servers.push(await startNext(3103, { DEMO_MODE: 'true', ENGINE_PATH: '/nonexistent/engine' }));
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
   } catch (e) {
     await stopAll();
     throw e;
   }
   return {
     db, emulator, seedOutput: seed.out.split('\n'),
+<<<<<<< HEAD
     demoUrl: 'http://127.0.0.1:3101', noEngineUrl: 'http://127.0.0.1:3103',
+=======
+    demoUrl: 'http://127.0.0.1:3101', strictUrl: 'http://127.0.0.1:3102', noEngineUrl: 'http://127.0.0.1:3103',
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
     envFor,
     stop: stopAll,
   };

@@ -30,6 +30,14 @@ export function appUrl(): string {
   return (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/+$/, '');
 }
 
+<<<<<<< HEAD
+=======
+/** Demo mode links FICTIONAL records automatically at registration. Default: off. */
+export function isDemoMode(): boolean {
+  return (process.env.DEMO_MODE || '').trim().toLowerCase() === 'true';
+}
+
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
 export function isProduction(): boolean {
   return process.env.NODE_ENV === 'production';
 }

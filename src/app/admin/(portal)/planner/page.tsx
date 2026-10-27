@@ -12,6 +12,7 @@ export default async function PlannerPage() {
   today.setUTCHours(0, 0, 0, 0);
   const days = Array.from({ length: 7 }, (_, i) => new Date(today.getTime() + i * 86400000).toISOString().slice(0, 10));
   const appts = (await db.from('appointments').select('scheduled_date, slot_minutes').eq('status', 'scheduled').gte('scheduled_date', days[0]).lte('scheduled_date', days[6]).limit(5000)).data ?? [];
+<<<<<<< HEAD
   const FROM = 20, TO = 35; // 10:00 .. 17:30 (half-hour slots)
   const load = await engine.appointmentLoad({
     rows: 7, cols: 48, fromCol: FROM, toCol: TO,
@@ -19,6 +20,15 @@ export default async function PlannerPage() {
   }).catch(() => null);
 
   const ws = (await db.from('admission_workspaces').select('id, cap_id, workflow_stage, user_id').limit(5000)).data ?? [];
+=======
+  const FROM = 20, TO = 35; // 10:00 .. 17:30
+  const load = await engine.appointmentLoad({
+    rows: 7, cols: 48, fromCol: FROM, toCol: TO,
+    bookings: appts.flatMap((a) => { const r = days.indexOf(a.scheduled_date as string); const c = (a.slot_minutes as number) / 30; return r >= 0 ? [[r, c] as [number, number]] : []; }),
+  }).catch(() => null);
+
+  const ws = (await db.from('admission_workspaces').select('id, workflow_stage, user_id, created_at').limit(5000)).data ?? [];
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
   const docs = (await db.from('document_checklists').select('workspace_id, doc_code, status').limit(60000)).data ?? [];
   const types = (await db.from('document_types').select('code, title').order('sort_order')).data ?? [];
   const stageOf = new Map(ws.map((w) => [w.id as string, STAGES.indexOf(w.workflow_stage as (typeof STAGES)[number])]));
@@ -34,6 +44,7 @@ export default async function PlannerPage() {
     if (d.status === 'ready' || d.status === 'verified') cell.set(`${di}:${s}`, (cell.get(`${di}:${s}`) ?? 0) + 1);
     else missing.set(d.workspace_id as string, (missing.get(d.workspace_id as string) ?? 0) + 1);
   }
+<<<<<<< HEAD
   const readiness = types.length
     ? await engine.docReadiness({ docs: types.length, rounds: STAGES.length, roundTotals: stageTotals, cells: [...cell].map(([k, count]) => { const [doc, round] = k.split(':').map(Number); return { doc, round, count }; }) }).catch(() => null)
     : null;
@@ -42,6 +53,13 @@ export default async function PlannerPage() {
   const claimed = ws.filter((w) => w.user_id);
   const order = await engine.rankByScore(claimed.map((w, i) => ({ id: i, score: (missing.get(w.id as string) ?? 0) * 10 + (STAGES.length - 1 - (stageOf.get(w.id as string) ?? 0)) }))).catch(() => [] as number[]);
   const followUp = order.slice(0, 10).map((i) => claimed[i]).filter(Boolean);
+=======
+  const readiness = await engine.docReadiness({ docs: types.length, rounds: STAGES.length, roundTotals: stageTotals, cells: [...cell].map(([k, count]) => { const [doc, round] = k.split(':').map(Number); return { doc, round, count }; }) }).catch(() => null);
+
+  const claimed = ws.filter((w) => w.user_id);
+  const ranked = await engine.progressRank(claimed.map((w, i) => ({ studentId: i + 1, token: (w.id as string).slice(0, 8), score: (missing.get(w.id as string) ?? 0) * 10 + (STAGES.length - 1 - (stageOf.get(w.id as string) ?? 0)), enteredAt: w.created_at as string }))).catch(() => null);
+  const capByToken = new Map(claimed.map((w) => [(w.id as string).slice(0, 8), w.id as string]));
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
 
   return (
     <>
@@ -51,7 +69,11 @@ export default async function PlannerPage() {
           <h2 className="panel-title">Appointment load (next 7 days)</h2>
           {load ? (
             <>
+<<<<<<< HEAD
               <p className="small text-muted">A table of days × half-hour slots (a 2D array) counts the bookings. Quietest slots: {load.bestSlots.map(([r, c]) => `${days[r]} ${formatClock(c * 30)}`).join(', ') || 'none'}.</p>
+=======
+              <p className="small text-muted">A sparse matrix (days × half-hour slots): only {load.nonZeros} booked cells are stored out of {load.rows * load.cols} ({(load.density * 100).toFixed(1)}% filled). Best free slots: {load.bestSlots.slice(0, 3).map(([r, c]) => `${days[r]} ${formatClock(c * 30)}`).join(', ') || 'none'}.</p>
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
               <table className="admin-table"><thead><tr><th>Day</th><th>Booked</th></tr></thead><tbody>{days.map((d, i) => <tr key={d}><td>{d}</td><td>{load.rowSums[i] ?? 0}</td></tr>)}</tbody></table>
             </>
           ) : <p className="text-muted mb-0">The engine is not available.</p>}
@@ -63,12 +85,21 @@ export default async function PlannerPage() {
               {types.map((t, di) => <tr key={t.code}><td>{t.title}</td>{STAGES.map((s, si) => <td key={s}>{readiness.percent[di * STAGES.length + si] ?? 0}%</td>)}</tr>)}
             </tbody></table></div>
           ) : <p className="text-muted mb-0">The engine is not available.</p>}
+<<<<<<< HEAD
           {readiness ? <p className="small text-muted mt-2 mb-0">2D array (documents × stages). Weakest document: {types[readiness.weakestDoc]?.title ?? '-'}.</p> : null}
         </section></div>
         <div className="col-lg-5"><section className="panel">
           <h2 className="panel-title">Follow-up list</h2>
           <p className="small text-muted">Students with the most work left (missing documents, early stage) come first.</p>
           <ol className="mb-0">{followUp.map((w) => <li key={w.id as string}><a href={`/admin/students/${w.id}`}>{w.cap_id as string}</a></li>)}</ol>
+=======
+          {readiness ? <p className="small text-muted mt-2 mb-0">Dense matrix (documents × stages). Weakest document: {types[readiness.weakestDoc[0]]?.title ?? '-'}.</p> : null}
+        </section></div>
+        <div className="col-lg-5"><section className="panel">
+          <h2 className="panel-title">Follow-up list</h2>
+          <p className="small text-muted">A max-heap ranks students with the most work left (missing documents, early stage).</p>
+          <ol className="mb-0">{(ranked?.ranked ?? []).slice(0, 10).map((r) => <li key={r.token}><a href={`/admin/students/${capByToken.get(r.token)}`}>{r.token}…</a> <span className="text-muted small">score {r.score}</span></li>)}</ol>
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
         </section></div>
       </div>
     </>

@@ -12,7 +12,13 @@ coverage/
 .env.*.local
 *.pem
 
+<<<<<<< HEAD
 # compiled C++ programs (built per machine: Windows .exe locally, Linux binary on Render): cpp/build/
+=======
+# compiled C++ engine (built per machine: Windows .exe locally, Linux binary on Render)
+engine/build/*
+!engine/build/.gitkeep
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
 *.exe
 *.o
 *.obj

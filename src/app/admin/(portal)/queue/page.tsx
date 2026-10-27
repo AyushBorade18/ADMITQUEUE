@@ -18,7 +18,11 @@ export default async function QueuePage() {
   return (
     <>
       <h1 className="page-title">Service desk</h1>
+<<<<<<< HEAD
       <p className="text-muted">The engine picks who is called next: a priority queue for urgent requests and a normal queue (first come, first served) for the rest, with a fairness rule so regular students are not left waiting forever. Two staff clicking at once is protected by a version check.</p>
+=======
+      <p className="text-muted">The C++ engine picks who is called next: a priority lane (min-heap) and a regular lane (FIFO queue) with a fairness rule so regular students are not starved. Concurrent clicks are protected by a version check.</p>
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
       <div className="row g-3 mb-4">
         {counters.map((c) => {
           const cur = active.find((i) => i.counter_id === c.id);

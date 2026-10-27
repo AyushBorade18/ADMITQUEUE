@@ -10,7 +10,12 @@ export default async function AuditPage() {
   const { supabase: db, user } = await requireAdminPage();
   const logs = (await db.from('audit_logs').select('id, actor_id, action, entity_type, entity_id, note, undoable, undone_at, created_at').order('id', { ascending: false }).limit(100)).data ?? [];
   const mine = [...logs].filter((l) => l.actor_id === user.id && l.undoable && !l.undone_at).reverse();
+<<<<<<< HEAD
   const latest = mine.length ? await engine.undoTop(mine.map((l) => Number(l.id))).catch(() => null) : null;
+=======
+  const top = mine.length ? await engine.undoStack({ action: 'peek', capacity: 200, adminId: 0, entries: mine.map((l) => ({ actionId: Number(l.id) })) }).catch(() => null) : null;
+  const latest = top?.entry?.actionId ?? null;
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
   return (
     <>
       <h1 className="page-title">Audit log and undo</h1>

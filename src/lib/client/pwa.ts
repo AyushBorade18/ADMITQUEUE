@@ -6,8 +6,11 @@ type BeforeInstallPromptEvent = Event & { prompt: () => Promise<void>; userChoic
 type State = { online: boolean; canInstall: boolean; updateReady: boolean; installed: boolean };
 
 let state: State = { online: true, canInstall: false, updateReady: false, installed: false };
+<<<<<<< HEAD
 // must be ONE stable object: React calls getServerSnapshot repeatedly and requires the same reference each time
 const SERVER_STATE: State = { online: true, canInstall: false, updateReady: false, installed: false };
+=======
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
 const listeners = new Set<() => void>();
 let deferredPrompt: BeforeInstallPromptEvent | null = null;
 let waitingWorker: ServiceWorker | null = null;
@@ -88,6 +91,10 @@ export function usePwa(): State {
       return () => listeners.delete(cb);
     },
     () => state,
+<<<<<<< HEAD
     () => SERVER_STATE,
+=======
+    () => ({ online: true, canInstall: false, updateReady: false, installed: false }),
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
   );
 }

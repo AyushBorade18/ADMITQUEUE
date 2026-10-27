@@ -16,7 +16,12 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
   let stats: { algorithm: string; comparisons: number; size: number } | null = null;
   if (query) {
     const looksLikeId = /^[A-Za-z]{0,4}\d*$/.test(query) && /\d/.test(query);
+<<<<<<< HEAD
     const res = await engine.search(looksLikeId ? 'prefix' : 'name', looksLikeId ? query.toUpperCase() : query, all.map((s) => ({ capId: s.capId, name: s.name }))).catch(() => null);
+=======
+    const payload = all.map((s, i) => ({ id: i, appId: s.capId, name: s.name }));
+    const res = await engine.search(looksLikeId ? 'app_prefix' : 'name', looksLikeId ? query.toUpperCase() : query, payload).catch(() => null);
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
     if (res) {
       rows = res.matches.map((i) => all[i]);
       stats = res.stats;
@@ -30,11 +35,19 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
     <>
       <h1 className="page-title">Students</h1>
       <form className="filter-bar mb-3" method="get">
+<<<<<<< HEAD
         <input name="q" className="form-control search" defaultValue={query} placeholder="CAP ID prefix (e.g. EN2610) or name" aria-label="Search" />
         <button className="btn btn-primary" type="submit">Search</button>
         {query ? <Link className="btn btn-outline-secondary" href="/admin/students">Clear</Link> : null}
       </form>
       {stats ? <p className="small text-muted">Found with <strong>{stats.algorithm}</strong>: {stats.comparisons} comparisons over {stats.size} records.</p> : null}
+=======
+        <input name="q" className="form-control search" defaultValue={query} placeholder="CAP ID prefix (e.g. DM2600) or name" aria-label="Search" />
+        <button className="btn btn-primary" type="submit">Search</button>
+        {query ? <Link className="btn btn-outline-secondary" href="/admin/students">Clear</Link> : null}
+      </form>
+      {stats ? <p className="small text-muted">Found by the C++ engine using <strong>{stats.algorithm}</strong>: {stats.comparisons} comparisons over {stats.size} records.</p> : null}
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
       <div className="table-panel">
         <div className="table-responsive">
           <table className="admin-table">
@@ -47,7 +60,11 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
                   <td>{s.rank ?? '-'}</td>
                   <td>{isStage(s.stage) ? STAGE_LABEL[s.stage] : s.stage}</td>
                   <td>{s.recordState.replace('_', ' ')}</td>
+<<<<<<< HEAD
                   <td>{s.userId ? 'login ready' : 'no login'}</td>
+=======
+                  <td>{s.userId ? 'registered' : 'not claimed'}</td>
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
                 </tr>
               ))}
               {slice.length === 0 ? <tr><td colSpan={6} className="text-muted">No matching students.</td></tr> : null}

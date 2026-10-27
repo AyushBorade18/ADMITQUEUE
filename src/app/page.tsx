@@ -3,7 +3,11 @@ import { PublicBar } from '@/components/PublicBar';
 import { STAGES, STAGE_LABEL } from '@/lib/stages';
 
 const STAGE_TEXT: Record<string, string> = {
+<<<<<<< HEAD
   registration: 'Your CAP Application ID opens your own workspace.',
+=======
+  registration: 'Create your account with your CAP Application ID.',
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
   profile_verification: 'Your saved CAP record is verified and linked to your account.',
   preference_preparation: 'Build and save your ordered college and course preference list.',
   allotment_recorded: 'Your allotment, as recorded by the admission cell, appears here.',
@@ -24,7 +28,14 @@ export default function Home() {
             documents are still verified in person at the college. AdmitQueue tracks where you stand.
           </p>
           <div className="d-flex flex-wrap gap-2 mt-4">
+<<<<<<< HEAD
             <Link className="btn btn-primary btn-lg" href="/login">
+=======
+            <Link className="btn btn-primary btn-lg" href="/register">
+              Create your account
+            </Link>
+            <Link className="btn btn-outline-primary btn-lg" href="/login">
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
               Log in
             </Link>
           </div>
@@ -32,7 +43,11 @@ export default function Home() {
 
         <section className="panel mb-4">
           <h2 className="panel-title">What you will follow</h2>
+<<<<<<< HEAD
           <p className="text-muted">Seven stages take you from your first login to a completed admission.</p>
+=======
+          <p className="text-muted">Seven stages take you from registration to a completed admission.</p>
+>>>>>>> 89de309f19d2115fe6181c86cab66f16ea2c6f52
           <ol className="flow-list">
             {STAGES.map((s, i) => (
               <li key={s}>
