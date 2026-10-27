@@ -1,0 +1,27 @@
+# Render Blueprint: one native Node web service (no Docker).
+# NOT deployed or tested from this repository's build environment. After the first deploy open:
+#   /api/health          (site is up)
+#   /api/health/engine   ("mode":"cpp" = the C++ program runs; "mode":"typescript" = it could not be built, the
+#                         TypeScript copy of the same steps answers instead)
+services:
+  - type: web
+    name: admitqueue
+    runtime: node
+    plan: free
+    # "--include=dev" because the build needs TypeScript. "npm run build" compiles cpp/engine/main.cpp with g++
+    # (a missing compiler only prints a warning) and then builds the website.
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false

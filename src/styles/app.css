@@ -1,0 +1,29 @@
+/* Additions for the Next.js version (PWA banner, new components). Uses the existing AdmitQueue colours. */
+.pwa-banner {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 2000; background: #1b2437; color: #fff;
+  padding: 0.65rem 1rem; text-align: center; font-size: 0.92rem;
+}
+.online-dot { display: inline-block; width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--af-pending, #8792a4); }
+.online-dot.on { background: var(--af-done, #23805a); }
+.online-dot.off { background: #c0392b; }
+.demo-badge {
+  display: inline-block; background: rgba(184, 122, 5, 0.14); color: var(--af-progress, #b87a05);
+  font-size: 0.72rem; font-weight: 800; padding: 0.1rem 0.5rem; border-radius: 999px; letter-spacing: 0.02em;
+}
+.status-pill.verified, .status-pill.ready, .status-pill.allotted, .status-pill.linked, .status-pill.confirmed { background: rgba(35, 128, 90, 0.12); color: var(--af-done, #23805a); }
+.status-pill.not_allotted, .status-pill.record_unavailable, .status-pill.not_started, .status-pill.unclaimed { background: rgba(135, 146, 164, 0.18); color: #4f596b; }
+.status-pill.frozen, .status-pill.submitted { background: rgba(15, 92, 120, 0.12); color: var(--af-brand, #0f5c78); }
+.status-pill.pending_verification, .status-pill.under_review { background: rgba(184, 122, 5, 0.14); color: var(--af-progress, #b87a05); }
+.status-pill.cancelled, .status-pill.rejected { background: rgba(190, 52, 52, 0.12); color: #a52a2a; }
+.stage-track { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.25rem; }
+.stage-track li { display: flex; gap: 0.75rem; align-items: center; padding: 0.4rem 0; }
+.stage-dot { flex: 0 0 1.6rem; height: 1.6rem; border-radius: 50%; border: 2px solid var(--af-pending, #8792a4); display: grid; place-items: center; font-size: 0.75rem; font-weight: 800; color: var(--af-pending, #8792a4); background: #fff; }
+.stage-track li.done .stage-dot { background: var(--af-done, #23805a); border-color: var(--af-done, #23805a); color: #fff; }
+.stage-track li.current .stage-dot { border-color: var(--af-brand, #0f5c78); color: var(--af-brand, #0f5c78); box-shadow: 0 0 0 4px rgba(15, 92, 120, 0.15); }
+.stage-track li.current .stage-name { font-weight: 800; }
+.pref-row { display: flex; gap: 0.75rem; align-items: center; border: 1px solid var(--af-line, #dfe4ec); border-radius: 0.6rem; padding: 0.6rem 0.8rem; margin-bottom: 0.5rem; background: #fff; }
+.pref-no { flex: 0 0 2rem; height: 2rem; border-radius: 50%; background: rgba(15, 92, 120, 0.1); color: var(--af-brand, #0f5c78); display: grid; place-items: center; font-weight: 800; }
+.course-card { border: 1px solid var(--af-line, #dfe4ec); border-radius: 0.6rem; padding: 0.6rem 0.8rem; background: #fff; }
+.skip-link { position: absolute; left: -999px; top: 0; background: #fff; padding: 0.5rem 1rem; z-index: 3000; }
+.skip-link:focus { left: 0.5rem; top: 0.5rem; }
+@media (max-width: 575.98px) { .app-nav .nav { width: 100%; overflow-x: auto; flex-wrap: nowrap !important; } }
